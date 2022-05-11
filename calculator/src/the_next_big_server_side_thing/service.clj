@@ -1,6 +1,7 @@
 (ns the-next-big-server-side-thing.service
   (:require [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
+            [hiccup.page :as hiccup]
             [io.pedestal.http.body-params :as body-params]
             [ring.util.response :as ring-resp]))
 
@@ -12,7 +13,64 @@
 
 (defn home-page
   [request]
-  (ring-resp/response "Hello World!"))
+  (ring-resp/response 
+   (hiccup/html5
+    [:html
+     [:head
+      [:script "function dis(val)\n{\ndocument.getElementById(\"result\").value+=val\n}\nfunction solve()\n{\nlet x = document.getElementById(\"result\").value\nlet y = eval(x)\ndocument.getElementById(\"result\").value = y\n}\nfunction clr()\n{\ndocument.getElementById(\"result\").value = \"\"\n}
+   "]
+  ;;     [:style ".title{\nmargin-bottom: 10px;\ntext-align:center;\nwidth: 210px;\ncolor:green;\nborder: solid black 2px;\n}\ninput
+  ;;  [type=\"button\"]\n{\nbackground-color:orange;\ncolor: black;\nborder: solid black 2px;\nwidth:100%\n}\ninput
+  ;;  [type=\"text\"]\n{\nbackground-color:white;\nborder: solid black 2px;\nwidth:100%\n}
+  ;;  "]
+      ]
+     [:body
+      [:div {:class "title"}
+       "Calculator"]
+      [:table {:border "1"}
+       [:tbody
+        [:tr
+         [:td {:colspan "3"}
+          [:input {:type "text", :id "result"}]]
+         [:td
+          [:input {:type "button", :value "c", :onclick "clr()"}]]]
+        [:tr
+         [:td
+          [:input {:type "button", :value "1", :onclick "dis('1')"}]]
+         [:td
+          [:input {:type "button", :value "2", :onclick "dis('2')"}]]
+         [:td
+          [:input {:type "button", :value "3", :onclick "dis('3')"}]]
+         [:td
+          [:input {:type "button", :value "/", :onclick "dis('/')"}]]]
+        [:tr
+         [:td
+          [:input {:type "button", :value "4", :onclick "dis('4')"}]]
+         [:td
+          [:input {:type "button", :value "5", :onclick "dis('5')"}]]
+         [:td
+          [:input {:type "button", :value "6", :onclick "dis('6')"}]]
+         [:td
+          [:input {:type "button", :value "-", :onclick "dis('-')"}]]]
+        [:tr
+         [:td
+          [:input {:type "button", :value "7", :onclick "dis('7')"}]]
+         [:td
+          [:input {:type "button", :value "8", :onclick "dis('8')"}]]
+         [:td
+          [:input {:type "button", :value "9", :onclick "dis('9')"}]]
+         [:td
+          [:input {:type "button", :value "+", :onclick "dis('+')"}]]]
+        [:tr
+         [:td
+          [:input {:type "button", :value ".", :onclick "dis('.')"}]]
+         [:td
+          [:input {:type "button", :value "0", :onclick "dis('0')"}]]
+         [:td
+          [:input {:type "button", :value "=", :onclick "solve()"}]]
+         [:td
+          [:input {:type "button", :value "*", :onclick "dis('*')"}]]]]]]]
+    )))
 
 ;; Defines "/" and "/about" routes with their associated :get handlers.
 ;; The interceptors defined after the verb map (e.g., {:get home-page}
@@ -57,9 +115,9 @@
               ;; and specifically the Content Security Policy appropriate to your service/application
               ;; For more information, see: https://content-security-policy.com/
               ;;   See also: https://github.com/pedestal/pedestal/issues/499
-              ;;::http/secure-headers {:content-security-policy-settings {:object-src "'none'"
-              ;;                                                          :script-src "'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:"
-              ;;                                                          :frame-ancestors "'none'"}}
+              ::http/secure-headers {:content-security-policy-settings {:object-src "'none'"
+                                                                      ;;  :script-src "'unsafe-inline' 'unsafe-hashes' 'unsafe-eval' 'strict-dynamic' https: http:"
+                                                                       :frame-ancestors "'none'"}}
 
               ;; Root for resource interceptor that is available by default.
               ::http/resource-path "/public"
